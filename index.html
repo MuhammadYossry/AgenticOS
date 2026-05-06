@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Agentic OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:          #060a12;
+  --s1:          #0c1220;
+  --s2:          #111828;
+  --s3:          #18243a;
+  --b0:          rgba(255,255,255,0.05);
+  --b1:          rgba(255,255,255,0.09);
+  --b2:          rgba(255,255,255,0.16);
+  --teal:        #3ce8b0;
+  --teal-bg:     rgba(60,232,176,0.10);
+  --teal-rim:    rgba(60,232,176,0.28);
+  --blue:        #6b91ff;
+  --blue-bg:     rgba(107,145,255,0.10);
+  --blue-rim:    rgba(107,145,255,0.25);
+  --amber:       #f5a832;
+  --amber-bg:    rgba(245,168,50,0.12);
+  --amber-rim:   rgba(245,168,50,0.28);
+  --coral:       #ff7c5c;
+  --coral-bg:    rgba(255,124,92,0.12);
+  --coral-rim:   rgba(255,124,92,0.25);
+  --t1:          #dde8ff;
+  --t2:          #7083a8;
+  --t3:          #344060;
+  --t4:          #1e2a42;
+  --fh:          'Syne', sans-serif;
+  --fb:          'Instrument Sans', sans-serif;
+  --fm:          'JetBrains Mono', monospace;
+  --r-sm:        8px;
+  --r-md:        14px;
+  --r-lg:        20px;
+  --r-xl:        26px;
+  --r-pill:      999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html { -webkit-font-smoothing: antialiased; }
+
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--fb);
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 100dvh;
+  padding: 12px 12px calc(100px + env(safe-area-inset-bottom));
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ─── NOISE TEXTURE OVERLAY ───────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── TOPBAR ──────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--s1);
+  border: 0.5px solid var(--b2);
+  border-radius: var(--r-xl);
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+.topbar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-xl);
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+.tb-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tb-logo {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: var(--teal-bg);
+  border: 0.5px solid var(--teal-rim);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--teal);
+  font-size: 18px;
+}
+.tb-wordmark {
+  font-family: var(--fh);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.4px;
+  color: var(--t1);
+}
+.tb-sub {
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+.tb-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tb-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--teal-bg);
+  border: 0.5px solid var(--teal-rim);
+  border-radius: var(--r-pill);
+  padding: 4px 10px;
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--teal);
+  letter-spacing: 0.04em;
+}
+.tb-badge::before {
+  content: '';
+  width: 5px; height: 5px;
+  background: var(--teal);
+  border-radius: 50%;
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+.clock {
+  font-family: var(--fm);
+  font-size: 12px;
+  color: var(--t2);
+  letter-spacing: 0.06em;
+}
+
+/* ─── SECTION LABEL ───────────────────────── */
+.sec-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0 2px;
+  margin-bottom: 9px;
+}
+.sec-label i { font-size: 13px; }
+
+/* ─── AGENT SECTION ───────────────────────── */
+.agent-section { margin-bottom: 18px; position: relative; z-index: 1; }
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+}
+
+.app-card {
+  background: var(--s1);
+  border: 0.5px solid var(--b1);
+  border-radius: var(--r-lg);
+  padding: 14px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+  min-height: 96px;
+}
+.app-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.07) 50%, transparent 90%);
+}
+.app-card:active { transform: scale(0.96); }
+.app-card:hover, .app-card:focus { border-color: var(--b2); background: var(--s2); outline: none; }
+
+.app-icon {
+  width: 38px; height: 38px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.ic-teal  { background: var(--teal-bg);  color: var(--teal);  border: 0.5px solid var(--teal-rim); }
+.ic-blue  { background: var(--blue-bg);  color: var(--blue);  border: 0.5px solid var(--blue-rim); }
+.ic-amber { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-rim);}
+.ic-coral { background: var(--coral-bg); color: var(--coral); border: 0.5px solid var(--coral-rim);}
+
+.app-name {
+  font-family: var(--fb);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  line-height: 1.3;
+}
+.app-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--t3);
+}
+.dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-on   { background: var(--teal); }
+.dot-busy { background: var(--amber); }
+.dot-off  { background: var(--t4); }
+
+/* ─── PANEL ───────────────────────────────── */
+.panel {
+  background: var(--s1);
+  border: 0.5px solid var(--b1);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.22s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.panel-hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 0.5px solid transparent;
+  transition: border-color 0.15s;
+}
+.panel-hdr.open { border-color: var(--b0); }
+.panel-hdr-icon {
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.panel-title {
+  font-family: var(--fh);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: var(--t1);
+  flex: 1;
+}
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chevron-btn {
+  width: 26px; height: 26px;
+  background: var(--s2);
+  border: 0.5px solid var(--b1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--t2);
+  font-size: 14px;
+  transition: transform 0.22s;
+}
+.chevron-btn.open { transform: rotate(180deg); }
+.close-btn {
+  width: 26px; height: 26px;
+  background: transparent;
+  border: 0.5px solid var(--b1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--t3);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.close-btn:hover { background: var(--coral-bg); color: var(--coral); border-color: var(--coral-rim); }
+
+.panel-body { padding: 14px 16px; display: none; }
+.panel-body.open { display: block; }
+
+/* ─── CHAT / CONTROL HUB ─────────────────── */
+.chat-log {
+  background: var(--s2);
+  border: 0.5px solid var(--b0);
+  border-radius: var(--r-lg);
+  padding: 10px;
+  max-height: 210px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+.bubble {
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 90%;
+  animation: fadeUp 0.15s ease;
+}
+.b-user {
+  background: var(--blue-bg);
+  border: 0.5px solid var(--blue-rim);
+  color: var(--t1);
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+.b-agent {
+  background: var(--s3);
+  border: 0.5px solid var(--b1);
+  border-left: 2px solid var(--teal);
+  color: var(--t2);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+/* ─── INPUT BAR ────────────────────────────── */
+.input-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--s2);
+  border: 0.5px solid var(--b2);
+  border-radius: var(--r-pill);
+  padding: 6px 6px 6px 12px;
+  transition: border-color 0.15s;
+}
+.input-bar:focus-within { border-color: var(--teal-rim); }
+
+.task-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--fb);
+  font-size: 13px;
+  color: var(--t1);
+  caret-color: var(--teal);
+  min-width: 0;
+}
+.task-input::placeholder { color: var(--t3); }
+
+.ib-btn {
+  width: 34px; height: 34px;
+  border: none;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+}
+.ib-btn:active { transform: scale(0.92); }
+.ib-attach {
+  background: var(--s3);
+  color: var(--t2);
+  border: 0.5px solid var(--b1);
+}
+.ib-attach:hover { background: var(--blue-bg); color: var(--blue); border-color: var(--blue-rim); }
+.ib-send {
+  background: var(--teal);
+  color: #050911;
+}
+.ib-send:hover { background: #4dffc0; }
+
+/* ─── METRICS GRID ─────────────────────────── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.metric-card {
+  background: var(--s2);
+  border: 0.5px solid var(--b0);
+  border-radius: var(--r-md);
+  padding: 11px 13px;
+}
+.metric-label {
+  font-family: var(--fm);
+  font-size: 9px;
+  color: var(--t3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.metric-val {
+  font-family: var(--fh);
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.mv-teal  { color: var(--teal);  }
+.mv-amber { color: var(--amber); }
+.mv-blue  { color: var(--blue);  }
+.mv-def   { color: var(--t1);    }
+
+/* ─── CHART ─────────────────────────────────── */
+.chart-wrap {
+  background: var(--s2);
+  border: 0.5px solid var(--b0);
+  border-radius: var(--r-lg);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+canvas { width: 100% !important; max-height: 130px; }
+
+/* ─── STAT PILLS ─────────────────────────────── */
+.pills-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.pill {
+  background: var(--s2);
+  border: 0.5px solid var(--b0);
+  border-radius: var(--r-pill);
+  padding: 4px 11px;
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--t2);
+  display: flex; align-items: center; gap: 5px;
+}
+.pill b { color: var(--t1); font-weight: 500; }
+.pill .teal  { color: var(--teal);  }
+.pill .amber { color: var(--amber); }
+
+/* ─── AGENT DETAIL (inside panel) ──────────── */
+.agt-hdr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+.agt-avatar {
+  width: 46px; height: 46px;
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.agt-name {
+  font-family: var(--fh);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.agt-sub {
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--t2);
+  margin-top: 2px;
+  letter-spacing: 0.03em;
+}
+.skills-row {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 13px;
+}
+.skill {
+  background: var(--blue-bg);
+  border: 0.5px solid var(--blue-rim);
+  border-radius: var(--r-pill);
+  padding: 3px 9px;
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--blue);
+  letter-spacing: 0.02em;
+}
+.reward-wrap { margin-bottom: 13px; }
+.reward-head {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--fm);
+  font-size: 10px;
+  color: var(--t2);
+  margin-bottom: 6px;
+}
+.reward-track {
+  height: 3px;
+  background: var(--s3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.reward-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), #7dffd6);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.live-feed {
+  background: var(--s2);
+  border: 0.5px solid var(--b0);
+  border-radius: var(--r-lg);
+  max-height: 170px;
+  overflow-y: auto;
+}
+.fi {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 9px 13px;
+  border-bottom: 0.5px solid var(--b0);
+  font-family: var(--fm);
+  font-size: 11px;
+  color: var(--t2);
+  line-height: 1.5;
+  animation: fadeUp 0.15s ease;
+}
+.fi:last-child { border-bottom: none; }
+.fi-dot {
+  width: 5px; height: 5px;
+  background: var(--teal-rim);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.fi-time { color: var(--t4); flex-shrink: 0; }
+
+/* ─── LIQUID GLASS BOTTOM DOCK ─────────────── */
+.dock-wrap {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 10px calc(14px + env(safe-area-inset-bottom));
+  z-index: 1000;
+  pointer-events: none;
+}
+.dock {
+  width: 100%;
+  max-width: 456px;
+  background: rgba(8, 13, 24, 0.52);
+  backdrop-filter: blur(28px) saturate(1.6) brightness(1.05);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6) brightness(1.05);
+  border: 0.5px solid rgba(255,255,255,0.13);
+  border-radius: 24px;
+  padding: 10px 10px 10px;
+  pointer-events: all;
+  position: relative;
+  overflow: hidden;
+}
+/* glass highlight shimmer at top */
+.dock::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 12%; right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+}
+/* subtle inner glow */
+.dock::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(60,232,176,0.05), transparent 70%);
+  pointer-events: none;
+}
+.dock-scroll {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 2px;
+}
+.dock-scroll::-webkit-scrollbar { display: none; }
+
+.dock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 56px;
+  cursor: pointer;
+  padding: 5px 4px 4px;
+  border-radius: var(--r-md);
+  transition: background 0.15s, transform 0.1s;
+  position: relative;
+  flex-shrink: 0;
+}
+.dock-item:active { transform: scale(0.93); }
+.dock-item:hover { background: rgba(255,255,255,0.05); }
+
+.dock-icon-wrap {
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  position: relative;
+  border: 0.5px solid var(--b1);
+  transition: border-color 0.15s;
+}
+.dock-item:hover .dock-icon-wrap { border-color: var(--b2); }
+
+.dock-status {
+  position: absolute;
+  bottom: -2px; right: -2px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(8,13,24,0.7);
+}
+.ds-on   { background: var(--teal);  }
+.ds-busy { background: var(--amber); }
+.ds-off  { background: var(--t4);    }
+
+.dock-label {
+  font-family: var(--fm);
+  font-size: 9px;
+  color: var(--t2);
+  letter-spacing: 0.02em;
+  text-align: center;
+  white-space: nowrap;
+  max-width: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── SCROLLBAR ─────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ──────────── TOP BAR ──────────────────── -->
+<div class="topbar">
+  <div class="tb-brand">
+    <div class="tb-logo"><i class="ti ti-bolt" aria-hidden="true"></i></div>
+    <div>
+      <div class="tb-wordmark">Agentic OS</div>
+      <div class="tb-sub">v3.0 · glass runtime</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-badge">7 live</div>
+    <div class="clock" id="liveClock">--:--</div>
+  </div>
+</div>
+
+<!-- ──────────── CONTROL HUB ─────────────── -->
+<div class="panel">
+  <div class="panel-hdr open" id="chatHdr" onclick="togglePanel('chatBody','chatHdr','chatChevron')">
+    <div class="panel-hdr-icon ic-blue"><i class="ti ti-message-2" aria-hidden="true"></i></div>
+    <div class="panel-title">Control Hub</div>
+    <div class="panel-actions">
+      <div class="chevron-btn open" id="chatChevron"><i class="ti ti-chevron-down" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="panel-body open" id="chatBody">
+    <div class="chat-log" id="globalChatLog">
+      <div class="bubble b-agent">Orchestrator ready — tap any agent or type a task below to get started.</div>
+    </div>
+    <div class="input-bar">
+      <button class="ib-btn ib-attach" title="Attach file" onclick="triggerUpload()">
+        <i class="ti ti-paperclip" aria-hidden="true"></i>
+      </button>
+      <input class="task-input" id="taskInput" type="text"
+        placeholder="Assign a task to any agent…"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter') dispatchTask()">
+      <button class="ib-btn ib-send" title="Send" onclick="dispatchTask()">
+        <i class="ti ti-send" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────── AGENT GROUPS ─────────────── -->
+<div class="agent-section">
+  <div class="sec-label"><i class="ti ti-coin" aria-hidden="true"></i> Finance &amp; Accounting</div>
+  <div class="app-grid">
+    <div class="app-card" onclick="openAgent('accountantAgent')" tabindex="0">
+      <div class="app-icon ic-teal"><i class="ti ti-receipt" aria-hidden="true"></i></div>
+      <div class="app-name">Accountant Agent</div>
+      <div class="app-stat"><span class="dot dot-on"></span>active</div>
+    </div>
+    <div class="app-card" onclick="openAgent('analystAgent')" tabindex="0">
+      <div class="app-icon ic-blue"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
+      <div class="app-name">Analyst Agent</div>
+      <div class="app-stat"><span class="dot dot-on"></span>active</div>
+    </div>
+  </div>
+</div>
+
+<div class="agent-section">
+  <div class="sec-label"><i class="ti ti-code" aria-hidden="true"></i> Software Dev</div>
+  <div class="app-grid">
+    <div class="app-card" onclick="openAgent('sweAgent')" tabindex="0">
+      <div class="app-icon ic-teal"><i class="ti ti-terminal" aria-hidden="true"></i></div>
+      <div class="app-name">SW Dev Agent</div>
+      <div class="app-stat"><span class="dot dot-on"></span>active</div>
+    </div>
+    <div class="app-card" onclick="openAgent('reviewerAgent')" tabindex="0">
+      <div class="app-icon ic-amber"><i class="ti ti-eye" aria-hidden="true"></i></div>
+      <div class="app-name">Code Reviewer</div>
+      <div class="app-stat"><span class="dot dot-off"></span>idle</div>
+    </div>
+  </div>
+</div>
+
+<div class="agent-section">
+  <div class="sec-label"><i class="ti ti-edit" aria-hidden="true"></i> Content &amp; Creative</div>
+  <div class="app-grid">
+    <div class="app-card" onclick="openAgent('writerAgent')" tabindex="0">
+      <div class="app-icon ic-coral"><i class="ti ti-pencil" aria-hidden="true"></i></div>
+      <div class="app-name">Content Writer</div>
+      <div class="app-stat"><span class="dot dot-on"></span>active</div>
+    </div>
+    <div class="app-card" onclick="openAgent('socialAgent')" tabindex="0">
+      <div class="app-icon ic-amber"><i class="ti ti-speakerphone" aria-hidden="true"></i></div>
+      <div class="app-name">Social Media</div>
+      <div class="app-stat"><span class="dot dot-busy"></span>busy</div>
+    </div>
+  </div>
+</div>
+
+<div class="agent-section">
+  <div class="sec-label"><i class="ti ti-user" aria-hidden="true"></i> Assistants &amp; Support</div>
+  <div class="app-grid">
+    <div class="app-card" onclick="openAgent('personalAgent')" tabindex="0">
+      <div class="app-icon ic-blue"><i class="ti ti-user-circle" aria-hidden="true"></i></div>
+      <div class="app-name">Personal Asst.</div>
+      <div class="app-stat"><span class="dot dot-on"></span>active</div>
+    </div>
+    <div class="app-card" onclick="openAgent('supportAgent')" tabindex="0">
+      <div class="app-icon ic-coral"><i class="ti ti-headset" aria-hidden="true"></i></div>
+      <div class="app-name">Support Agent</div>
+      <div class="app-stat"><span class="dot dot-off"></span>idle</div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────── DYNAMIC AGENT PANELS ─────── -->
+<div id="agentPanelsContainer"></div>
+
+<!-- ──────────── GLOBAL ORCHESTRATOR ─────── -->
+<div class="panel" id="orchPanel">
+  <div class="panel-hdr open" onclick="togglePanel('orchBody','orchHdr','orchChevron')" id="orchHdr">
+    <div class="panel-hdr-icon ic-teal"><i class="ti ti-cpu" aria-hidden="true"></i></div>
+    <div class="panel-title">Global Orchestrator</div>
+    <div class="panel-actions">
+      <div class="chevron-btn open" id="orchChevron"><i class="ti ti-chevron-down" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="panel-body open" id="orchBody">
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Active Agents</div>
+        <div class="metric-val mv-teal">7</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Avg Reward · 7d</div>
+        <div class="metric-val mv-amber" id="globalAvg">+0.82</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">GPU Pool</div>
+        <div class="metric-val mv-blue" id="gpuMetric">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">LLM Latency</div>
+        <div class="metric-val mv-def" id="latMetric">—</div>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="rewardChart"></canvas>
+    </div>
+    <div class="pills-row">
+      <div class="pill">Skills <b>24</b></div>
+      <div class="pill">Token eff. <b class="teal">0.94×</b></div>
+      <div class="pill">Budget <b class="amber">72%</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────── LIQUID GLASS DOCK ────────── -->
+<div class="dock-wrap" role="navigation" aria-label="Agent launcher">
+  <div class="dock">
+    <div class="dock-scroll" id="dockScroll">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── AGENT DATA ──────────────────────────── */
+const AGENTS = {
+  accountantAgent: { name:'Accountant', icon:'ti-receipt',     status:'active', color:'ic-teal',  reward:14, max:20, skills:['audit','reconciliation','tax'], feed:[] },
+  analystAgent:    { name:'Analyst',    icon:'ti-chart-bar',   status:'active', color:'ic-blue',  reward:9,  max:20, skills:['forecast','sql','pivot'], feed:[] },
+  sweAgent:        { name:'SW Dev',     icon:'ti-terminal',    status:'active', color:'ic-teal',  reward:18, max:20, skills:['refactor','unittest','api-design'], feed:[] },
+  reviewerAgent:   { name:'Reviewer',  icon:'ti-eye',          status:'idle',   color:'ic-amber', reward:7,  max:20, skills:['static-analysis','security'], feed:[] },
+  writerAgent:     { name:'Writer',    icon:'ti-pencil',        status:'active', color:'ic-coral', reward:11, max:20, skills:['seo','copywriting','brand-tone'], feed:[] },
+  socialAgent:     { name:'Social',    icon:'ti-speakerphone',  status:'busy',   color:'ic-amber', reward:6,  max:20, skills:['scheduling','engagement'], feed:[] },
+  personalAgent:   { name:'Personal',  icon:'ti-user-circle',  status:'active', color:'ic-blue',  reward:10, max:20, skills:['calendar','email','reminders'], feed:[] },
+  supportAgent:    { name:'Support',   icon:'ti-headset',       status:'idle',   color:'ic-coral', reward:8,  max:20, skills:['ticketing','faq'], feed:[] },
+};
+
+const statusDotClass = { active:'ds-on', busy:'ds-busy', idle:'ds-off' };
+
+/* ─── BUILD DOCK ──────────────────────────── */
+function buildDock() {
+  const scroll = document.getElementById('dockScroll');
+  scroll.innerHTML = '';
+  Object.entries(AGENTS).forEach(([id, a]) => {
+    const btn = document.createElement('div');
+    btn.className = 'dock-item';
+    btn.id = `dock_${id}`;
+    btn.setAttribute('role', 'button');
+    btn.setAttribute('aria-label', `Open ${a.name}`);
+    btn.setAttribute('tabindex', '0');
+    btn.onclick = () => openAgent(id);
+    btn.innerHTML = `
+      <div class="dock-icon-wrap ${a.color}">
+        <i class="ti ${a.icon}" style="font-size:20px" aria-hidden="true"></i>
+        <span class="dock-status ${statusDotClass[a.status]}"></span>
+      </div>
+      <div class="dock-label">${a.name}</div>
+    `;
+    scroll.appendChild(btn);
+  });
+}
+
+/* ─── PANEL TOGGLE ────────────────────────── */
+function togglePanel(bodyId, hdrId, chevId) {
+  const body = document.getElementById(bodyId);
+  const hdr  = document.getElementById(hdrId);
+  const chev = document.getElementById(chevId);
+  if (!body) return;
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  body.style.display = open ? 'none' : 'block';
+  if (hdr)  hdr.classList.toggle('open', !open);
+  if (chev) chev.classList.toggle('open', !open);
+}
+
+/* ─── OPEN AGENT PANEL ────────────────────── */
+function openAgent(id) {
+  const existing = document.getElementById(`panel_${id}`);
+  if (existing) { existing.scrollIntoView({ behavior:'smooth', block:'nearest' }); return; }
+  const a = AGENTS[id];
+  const div = document.createElement('div');
+  div.className = 'panel';
+  div.id = `panel_${id}`;
+  const bodyId   = `pbody_${id}`;
+  const hdrId    = `phdr_${id}`;
+  const chevId   = `pchev_${id}`;
+  div.innerHTML = `
+    <div class="panel-hdr open" id="${hdrId}" onclick="togglePanel('${bodyId}','${hdrId}','${chevId}')">
+      <div class="panel-hdr-icon ${a.color}"><i class="ti ${a.icon}" aria-hidden="true"></i></div>
+      <div class="panel-title">${a.name}</div>
+      <div class="panel-actions">
+        <div class="chevron-btn open" id="${chevId}"><i class="ti ti-chevron-down" aria-hidden="true"></i></div>
+        <div class="close-btn" onclick="event.stopPropagation(); closeAgent('${id}')">
+          <i class="ti ti-x" aria-hidden="true"></i>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body open" id="${bodyId}">
+      <div id="pinner_${id}"></div>
+    </div>
+  `;
+  document.getElementById('agentPanelsContainer').appendChild(div);
+  renderAgentInner(id);
+  setTimeout(() => div.scrollIntoView({ behavior:'smooth', block:'nearest' }), 40);
+}
+
+function closeAgent(id) {
+  const el = document.getElementById(`panel_${id}`);
+  if (el) el.remove();
+}
+
+function renderAgentInner(id) {
+  const inner = document.getElementById(`pinner_${id}`);
+  if (!inner) return;
+  const a = AGENTS[id];
+  const pct = Math.min(100, Math.round((a.reward / a.max) * 100));
+  const feedHtml = a.feed.length
+    ? a.feed.map(f =>
+        `<div class="fi">
+          <span class="fi-dot"></span>
+          <span class="fi-time">${f.t}</span>
+          <span>${f.msg}</span>
+        </div>`).join('')
+    : `<div class="fi"><span class="fi-dot"></span><span>Waiting for tasks…</span></div>`;
+  inner.innerHTML = `
+    <div class="agt-hdr">
+      <div class="agt-avatar ${a.color}"><i class="ti ${a.icon}" style="font-size:22px" aria-hidden="true"></i></div>
+      <div>
+        <div class="agt-name">${a.name} Agent</div>
+        <div class="agt-sub">status: ${a.status} · reward_ev: ${a.reward}</div>
+      </div>
+    </div>
+    <div class="skills-row">${a.skills.map(s => `<span class="skill">${s}</span>`).join('')}</div>
+    <div class="reward-wrap">
+      <div class="reward-head"><span>reward evidence</span><span>${a.reward} / ${a.max}</span></div>
+      <div class="reward-track"><div class="reward-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="live-feed">${feedHtml}</div>
+  `;
+}
+
+/* ─── FEED UPDATE ─────────────────────────── */
+function addFeed(id, msg, r) {
+  const a = AGENTS[id];
+  if (!a) return;
+  const t = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  a.feed.unshift({ t, msg });
+  if (a.feed.length > 14) a.feed.pop();
+  if (r !== null) a.reward = Math.max(0, a.reward + r);
+  renderAgentInner(id);
+}
+
+/* ─── TASK DISPATCH ───────────────────────── */
+function dispatchTask() {
+  const input = document.getElementById('taskInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  bubble(text, true);
+  const lower = text.toLowerCase();
+  let target = 'sweAgent';
+  if (lower.match(/accountant|reconcil|tax/)) target = 'accountantAgent';
+  else if (lower.match(/analyst|forecast/))   target = 'analystAgent';
+  else if (lower.match(/dev|code|refactor/))  target = 'sweAgent';
+  else if (lower.match(/review|pr\b/))        target = 'reviewerAgent';
+  else if (lower.match(/writer|blog|content/))target = 'writerAgent';
+  else if (lower.match(/social|post/))        target = 'socialAgent';
+  else if (lower.match(/assistant|calendar|reminder/)) target = 'personalAgent';
+  else if (lower.match(/support|ticket/))     target = 'supportAgent';
+  const a = AGENTS[target];
+  bubble(`Routing to ${a.name}…`, false);
+  setTimeout(() => {
+    const r = Math.random() > 0.25 ? 1 : (Math.random() > 0.5 ? 0 : -1);
+    const icon = r === 1 ? '✓' : (r === 0 ? '~' : '✗');
+    const label= r === 1 ? 'done · reward +1' : (r === 0 ? 'partial · reward 0' : 'failed · reward -1');
+    addFeed(target, `"${text.slice(0,44)}" → [${icon}] ${label}`, r);
+    bubble(`${a.name}: [${icon}] ${label}`, false);
+    pushReward(r);
+    updateMetrics();
+    if (!document.getElementById(`panel_${target}`)) openAgent(target);
+  }, 380);
+  input.value = '';
+}
+
+function triggerUpload() {
+  bubble('(File attach coming soon)', false);
+}
+
+function bubble(msg, isUser) {
+  const log = document.getElementById('globalChatLog');
+  const el  = document.createElement('div');
+  el.className = `bubble ${isUser ? 'b-user' : 'b-agent'}`;
+  el.textContent = isUser ? msg : msg;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+}
+
+/* ─── REWARD CHART ────────────────────────── */
+let rewardHist  = [1,1,0,1,1,-1,1,0,1,1];
+let rewardLabel = ['t1','t2','t3','t4','t5','t6','t7','t8','t9','t10'];
+let chart;
+
+function initChart() {
+  const ctx = document.getElementById('rewardChart').getContext('2d');
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: rewardLabel,
+      datasets: [{
+        label: 'Reward',
+        data: rewardHist,
+        borderColor: '#3ce8b0',
+        backgroundColor: 'rgba(60,232,176,0.07)',
+        borderWidth: 1.5,
+        pointRadius: 3,
+        pointBackgroundColor: '#3ce8b0',
+        pointBorderColor: 'transparent',
+        tension: 0.35,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0c1220',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#7083a8',
+          bodyColor: '#dde8ff',
+          cornerRadius: 8,
+          padding: 8,
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#344060', font: { family:"'JetBrains Mono'", size:9 } }
+        },
+        y: {
+          min: -1.3, max: 1.3,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#344060', font: { family:"'JetBrains Mono'", size:9 }, stepSize: 1 }
+        }
+      }
+    }
+  });
+}
+
+function pushReward(r) {
+  rewardHist.push(r);
+  rewardLabel.push('·');
+  if (rewardHist.length > 14) { rewardHist.shift(); rewardLabel.shift(); }
+  if (chart) { chart.data.datasets[0].data = [...rewardHist]; chart.data.labels = [...rewardLabel]; chart.update(); }
+  const avg = (rewardHist.slice(-5).reduce((a,b)=>a+b,0)/5).toFixed(2);
+  document.getElementById('globalAvg').textContent = (avg >= 0 ? '+' : '') + avg;
+}
+
+function updateMetrics() {
+  document.getElementById('gpuMetric').textContent = Math.floor(30 + Math.random()*55) + '%';
+  document.getElementById('latMetric').textContent = Math.floor(180 + Math.random()*250) + 'ms';
+}
+
+function simulateUpdate() {
+  const keys = Object.keys(AGENTS);
+  const id = keys[Math.floor(Math.random() * keys.length)];
+  const r  = Math.random() > 0.6 ? 1 : (Math.random() > 0.5 ? 0 : -1);
+  const icon = r === 1 ? '✓' : (r === 0 ? '~' : '✗');
+  addFeed(id, `Periodic learning: context refresh [${icon}]`, r);
+  pushReward(r);
+  updateMetrics();
+}
+
+/* ─── SEED INITIAL DATA ───────────────────── */
+function seed() {
+  addFeed('accountantAgent','Q3 reconciliation ready [✓] reward +1', 1);
+  addFeed('sweAgent',       'Auth module refactored, tests pass [✓] +1', 1);
+  addFeed('writerAgent',    'Blog draft "AI in Fintech" — positive feedback [✓]', 1);
+  addFeed('personalAgent',  'Team meeting scheduled & reminders sent [✓]', 1);
+  addFeed('analystAgent',   'Sales anomaly detected, report generated [✓]', 1);
+  addFeed('reviewerAgent',  'PR #42 reviewed: minor issues [~] reward 0', 0);
+  addFeed('socialAgent',    'Week posts scheduled, +12% engagement [✓]', 1);
+  addFeed('supportAgent',   '3 tickets resolved, CSAT high [✓] +1', 1);
+}
+
+/* ─── CLOCK ───────────────────────────────── */
+function updateClock() {
+  document.getElementById('liveClock').textContent =
+    new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+/* ─── INIT ────────────────────────────────── */
+initChart();
+buildDock();
+seed();
+updateMetrics();
+updateClock();
+setInterval(updateClock, 1000);
+setInterval(() => { if (Math.random() > 0.6) simulateUpdate(); }, 10000);
+
+/* expose for inline handlers */
+window.togglePanel = togglePanel;
+window.openAgent   = openAgent;
+window.closeAgent  = closeAgent;
+window.dispatchTask = dispatchTask;
+window.triggerUpload = triggerUpload;
+</script>
+</body>
+</html>
